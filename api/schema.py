@@ -3,10 +3,10 @@ from pydantic import BaseModel, Extra
 
 
 class Place(BaseModel, extra=Extra.forbid):
-    geo_id: int = 0
+    uid: str
     with_feedback: bool = False
     latitude: float
     longitude: float
 
-class GetVisitedObjectsResponse(BaseModel, extra=Extra.forbid):
+class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]

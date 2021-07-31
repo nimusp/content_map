@@ -3,7 +3,7 @@ from aiohttp_pydantic import oas
 
 from api.base_view import DB_KEY
 
-from api.get_visited_objects import GetVisitedObjects
+from api.visited_places import VisitedPlaces
 
 from data.schema import get_db_conn_sessionmaker
 
@@ -12,7 +12,7 @@ from data.dao import Dao
 
 app = web.Application()
 app.add_routes([
-    web.get('/visited_objects', GetVisitedObjects),
+    web.get('/visited_places', VisitedPlaces),
 ])
 
 
