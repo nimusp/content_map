@@ -1,0 +1,21 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
+
+  web:
+    build: .
+    command: python3 main.py
+    restart: always
+    environment:
+      - DSN=postgresql+asyncpg://postgres:qwerty@db:5432/postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
