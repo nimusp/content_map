@@ -4,6 +4,7 @@ from aiohttp_pydantic import oas
 from api.base_view import DB_KEY
 
 from api.visited_places import VisitedPlaces
+from api.user_feedbacks import UserFeedbacks
 
 from data.schema import get_db_conn_sessionmaker
 
@@ -14,8 +15,8 @@ app = web.Application()
 app.add_routes([
     web.get('/visited_places', VisitedPlaces),
     web.post('/visited_places', VisitedPlaces),
-    web.get('/user_reviews', UserReviews),
-    web.post('/user_reviews', UserReviews),
+    web.get('/user_reviews', UserFeedbacks),
+    web.post('/user_reviews', UserFeedbacks),
 ])
 
 

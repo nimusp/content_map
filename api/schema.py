@@ -12,13 +12,12 @@ class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
 
 
-class Review(BaseModel, extra=Extra.forbid):
-    id: int
+class Feedback(BaseModel, extra=Extra.forbid):
     user_email: str
     place_uid: str
     rate: int
     feedback_text: str
 
-class GetUserReviewsResponse(BaseModel, extra=Extra.forbid):
-    reviews: List[Review]
+class GetUserFeedbacksResponse(BaseModel, extra=Extra.forbid):
+    feedbacks: List[Feedback]
 
