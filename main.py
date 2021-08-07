@@ -13,6 +13,9 @@ from data.dao import Dao
 app = web.Application()
 app.add_routes([
     web.get('/visited_places', VisitedPlaces),
+    web.post('/visited_places', VisitedPlaces),
+    web.get('/user_reviews', UserReviews),
+    web.post('/user_reviews', UserReviews),
 ])
 
 
