@@ -62,15 +62,16 @@ class Dao:
 
     async def post_user_feedback(self, feedback: Feedback):
         async with self._session_maker() as session:
-            stmt = (
-                insert(UserFeedbacksTable)
-                .values(
-                    user_email=feedback.user_email,
-                    place_uid=feedback.place_uid,
-                    rate=feedback.rate,
-                    feedback_text=feedback.feedback_text,
+            async with session.begin():
+                stmt = (
+                    insert(UserFeedbacksTable)
+                    .values(
+                        user_email=feedback.user_email,
+                        place_uid=feedback.place_uid,
+                        rate=feedback.rate,
+                        feedback_text=feedback.feedback_text,
+                    )
+                    .returning(UserFeedbacksTable.id)
                 )
-                .returning(UserFeedbacksTable.id)
-            )
-            result = await session.execute(stmt)
+                result = await session.execute(stmt)
             return result.scalar()
