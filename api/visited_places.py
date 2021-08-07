@@ -43,15 +43,6 @@ class VisitedPlaces(BaseView):
             ).dict(), status=HTTPStatus.OK
         )
 
-        # mock data
-        return web.json_response(
-            GetVisitedPlacesResponse(
-                places=[
-                    Place(uid='aaa', latitude=55.733842, longitude=37.588144), 
-                    Place(uid='bbb', with_feedback=True, latitude=55.729948, longitude=37.601736),
-                ],
-            ).dict(), status=HTTPStatus.OK)
-
     async def post(self, request: AddVisitedPlacesRequest) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
         await self.dao.add_user_places(
             request.user_email,
