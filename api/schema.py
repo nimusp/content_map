@@ -21,3 +21,9 @@ class Feedback(BaseModel, extra=Extra.forbid):
 class GetUserFeedbacksResponse(BaseModel, extra=Extra.forbid):
     feedbacks: List[Feedback]
 
+class AddUserFeedbackResponse(BaseModel, extra=Extra.forbid):
+    feedback_id: int
+
+
+class CommonError(BaseModel, extra=Extra.forbid):
+    message: str
