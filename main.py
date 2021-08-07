@@ -15,8 +15,8 @@ app = web.Application()
 app.add_routes([
     web.get('/visited_places', VisitedPlaces),
     web.post('/visited_places', VisitedPlaces),
-    web.get('/user_reviews', UserFeedbacks),
-    web.post('/user_reviews', UserFeedbacks),
+    web.get('/user_feedbacks', UserFeedbacks),
+    web.post('/user_feedback', UserFeedbacks),
 ])
 
 
