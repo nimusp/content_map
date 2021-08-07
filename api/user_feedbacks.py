@@ -39,7 +39,7 @@ class UserFeedbacks(BaseView):
 
     async def post(self, feedback: Feedback) -> r201[AddUserFeedbackResponse]:
         feedback_id = await self.dao.post_user_feedback(feedback=feedback)
-        
+
         return web.json_response(
             AddUserFeedbackResponse(
                 feedback_id=feedback_id
