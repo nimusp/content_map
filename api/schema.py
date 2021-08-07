@@ -8,5 +8,10 @@ class Place(BaseModel, extra=Extra.forbid):
     latitude: float
     longitude: float
 
+
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
+
+
+class GetVisitedPlacesError(BaseModel, extra=Extra.forbid):
+    error_message: str
