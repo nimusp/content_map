@@ -12,8 +12,24 @@ class Place(BaseModel, extra=Extra.forbid):
     longitude: confloat(ge=-180, le=180)
 
 
+
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
+
+
+class CommonError(BaseModel, extra=Extra.forbid):
+    error_message: str
+
+
+class AddVisitedPlacesRequest(BaseModel, extra=Extra.forbid):
+    user_email: str
+    place_uid: str
+    latitude: float
+    longitude: float
+
+
+class AddVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
+    place_uid: str
 
 
 class Feedback(BaseModel, extra=Extra.forbid):
@@ -29,7 +45,3 @@ class GetUserFeedbacksResponse(BaseModel, extra=Extra.forbid):
 
 class AddUserFeedbackResponse(BaseModel, extra=Extra.forbid):
     feedback_id: int
-
-
-class CommonError(BaseModel, extra=Extra.forbid):
-    message: str

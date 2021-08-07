@@ -15,13 +15,13 @@ from api.schema import (
 class UserFeedbacks(BaseView):
     async def get(
             self, user_email: str
-    ) -> Union[r201[AddUserFeedbackResponse], r404[CommonError]]:
+    ) -> Union[r200[AddUserFeedbackResponse], r404[CommonError]]:
 
         feedbacks = await self.dao.get_user_feedbacks(user_email=user_email)
 
         if not feedbacks:
             return web.json_response(
-                CommonError(message='no one feedback for current user').dict(),
+                CommonError(error_message='no one feedback for current user').dict(),
                 status=HTTPStatus.NOT_FOUND
             )
 

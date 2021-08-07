@@ -2,7 +2,7 @@ import os
 import sys
 import asyncio
 
-from sqlalchemy import Column, Integer, Float, String, Boolean, Text
+from sqlalchemy import Column, Integer, Float, String, Text, Table
 
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -15,13 +15,19 @@ from sqlalchemy.sql.schema import ForeignKey
 Base = declarative_base()
 
 
+user_places = Table(
+    'user_place', Base.metadata,
+    Column('user_email', ForeignKey('users.email'), primary_key=True),
+    Column('place_uid', ForeignKey('places.uid'), primary_key=True),
+)
+
+
 class UsersTable(Base):
     __tablename__ = 'users'
     email = Column(String, primary_key=True)
     visited_places = relationship(
-        "UserPlacesTable",
-        cascade="all,delete-orphan",
-        passive_deletes=True,
+        "PlacesTable",
+        secondary=user_places,
     )
     feedbacks = relationship(
         "UserFeedbacksTable",
@@ -35,14 +41,6 @@ class PlacesTable(Base):
     uid = Column(String, primary_key=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-
-
-class UserPlacesTable(Base):
-    __tablename__ = 'user_places'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_email = Column(String, ForeignKey('users.email'), nullable=False)
-    place_uid = Column(String, ForeignKey('places.uid'), nullable=False)
-    with_feedback = Column(Boolean, nullable=False, default=False)
 
 
 class UserFeedbacksTable(Base):
@@ -69,7 +67,7 @@ def get_db_conn_sessionmaker():
     if not dsn:
         sys.exit('empty DSN not allowed!')
 
-    engine = create_async_engine(dsn)
+    engine = create_async_engine(dsn, echo=True)
     return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
