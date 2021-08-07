@@ -19,7 +19,7 @@ class UsersTable(Base):
     __tablename__ = 'users'
     email = Column(String, primary_key=True)
     visited_places = relationship(
-        "PlacesTable",
+        "UserPlacesTable",
         cascade="all,delete-orphan",
         passive_deletes=True,
     )
@@ -40,7 +40,7 @@ class PlacesTable(Base):
 class UserPlacesTable(Base):
     __tablename__ = 'user_places'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_email = Column(String, ForeignKey('users.email'), nullable=False)
     place_uid = Column(String, ForeignKey('places.uid'), nullable=False)
     with_feedback = Column(Boolean, nullable=False, default=False)
 
@@ -48,7 +48,7 @@ class UserPlacesTable(Base):
 class UserFeedbacksTable(Base):
     __tablename__ = 'user_feedbacks'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_email = Column(String, ForeignKey('users.email'), nullable=False)
     place_uid = Column(String, ForeignKey('places.uid'), nullable=False)
     rate = Column(Integer, nullable=False, default=0)
     feedback_text = Column(Text, nullable=False, default='')
@@ -73,4 +73,4 @@ def get_db_conn_sessionmaker():
     return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
-asyncio.new_event_loop().run_until_complete(main())
+asyncio.get_event_loop().run_until_complete(main())
