@@ -27,7 +27,7 @@ class UserFeedbacks(BaseView):
 
         return web.json_response(
             GetUserFeedbacksResponse(
-                reviews=[
+                feedbacks=[
                     Feedback(
                         user_email=f.user_email,
                         place_uid=f.place_uid,
