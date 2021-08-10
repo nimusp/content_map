@@ -1,12 +1,16 @@
 from typing import List, Optional
-from pydantic import BaseModel, Extra
+from pydantic import (
+    BaseModel, Extra, validator, EmailStr,
+    conint, confloat
+)
 
 
 class Place(BaseModel, extra=Extra.forbid):
     uid: str
     with_feedback: bool = False
-    latitude: float
-    longitude: float
+    latitude: confloat(ge=-90, le=90)
+    longitude: confloat(ge=-180, le=180)
+
 
 
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
@@ -29,9 +33,9 @@ class AddVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
 
 
 class Feedback(BaseModel, extra=Extra.forbid):
-    user_email: str
+    user_email: EmailStr
     place_uid: str
-    rate: int
+    rate: conint(ge=0, le=5)
     feedback_text: str
 
 
