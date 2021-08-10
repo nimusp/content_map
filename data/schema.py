@@ -39,6 +39,7 @@ class UsersTable(Base):
 class PlacesTable(Base):
     __tablename__ = 'places'
     uid = Column(String, primary_key=True)
+    id = Column(Integer, nullable=False, default=0)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
