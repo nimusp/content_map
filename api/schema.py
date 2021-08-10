@@ -7,10 +7,10 @@ from pydantic import (
 
 class Place(BaseModel, extra=Extra.forbid):
     uid: str
+    id: int = 0
     with_feedback: bool = False
     latitude: confloat(ge=-90, le=90)
     longitude: confloat(ge=-180, le=180)
-
 
 
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
@@ -24,6 +24,7 @@ class CommonError(BaseModel, extra=Extra.forbid):
 class AddVisitedPlacesRequest(BaseModel, extra=Extra.forbid):
     user_email: str
     place_uid: str
+    place_id: int = 0
     latitude: float
     longitude: float
 

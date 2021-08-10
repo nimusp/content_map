@@ -35,6 +35,7 @@ class VisitedPlaces(BaseView):
                 places=[
                     Place(
                         uid=p.uid,
+                        id=p.id,
                         latitude=p.latitude,
                         longitude=p.longitude,
                         with_feedback=p.uid in places_with_feedback
@@ -46,7 +47,12 @@ class VisitedPlaces(BaseView):
     async def post(self, request: AddVisitedPlacesRequest) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
         await self.dao.add_user_places(
             request.user_email,
-            place=PlacesTable(uid=request.place_uid, latitude=request.latitude, longitude=request.longitude)
+            place=PlacesTable(
+                uid=request.place_uid,
+                id=request.place_id,
+                latitude=request.latitude,
+                longitude=request.longitude,
+            ),
         )
 
         return web.json_response(
