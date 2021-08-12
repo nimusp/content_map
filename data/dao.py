@@ -42,6 +42,7 @@ class Dao:
                 query = insert(PlacesTable). \
                     values(
                         uid=place.uid,
+                        id=place.id,
                         latitude=place.latitude,
                         longitude=place.longitude
                     ).on_conflict_do_nothing()

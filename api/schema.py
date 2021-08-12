@@ -3,14 +3,31 @@ from pydantic import (
     BaseModel, Extra, validator, EmailStr,
     conint, confloat
 )
+from enum import Enum, IntEnum
 
 
-class Place(BaseModel, extra=Extra.forbid):
+class UserContext(str, Enum):
+    default = 'DEFAULT'
+    ugc = 'UGC'
+
+
+class PlaceState(IntEnum):
+    full = 1
+    smallest = 5
+
+
+class FeedbackSmall(BaseModel):
+    rate: int = 0
+    text: str = ''
+
+
+class Place(BaseModel):
     uid: str
-    with_feedback: bool = False
+    id: int = 0
     latitude: confloat(ge=-90, le=90)
     longitude: confloat(ge=-180, le=180)
-
+    state: PlaceState = PlaceState.smallest
+    feedback: FeedbackSmall = None
 
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
@@ -23,6 +40,7 @@ class CommonError(BaseModel, extra=Extra.forbid):
 class AddVisitedPlacesRequest(BaseModel, extra=Extra.forbid):
     user_email: str
     place_uid: str
+    place_id: int = 0
     latitude: float
     longitude: float
 
