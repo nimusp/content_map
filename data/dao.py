@@ -1,12 +1,15 @@
-from data.schema import UsersTable, PlacesTable, user_places
+from typing import Optional
 
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.sql.expression import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import selectinload
+from sqlalchemy.exc import NoResultFound
+
 
 from data.schema import UserFeedbacksTable
-from api.schema import Feedback
+from data.schema import UsersTable, PlacesTable, user_places
+from api.schema import Feedback, Place, GetVisitedPlacesResponse
 
 
 class Dao:
@@ -75,3 +78,4 @@ class Dao:
                 )
                 result = await session.execute(stmt)
             return result.scalar()
+

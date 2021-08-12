@@ -12,7 +12,6 @@ class Place(BaseModel, extra=Extra.forbid):
     longitude: confloat(ge=-180, le=180)
 
 
-
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
 
