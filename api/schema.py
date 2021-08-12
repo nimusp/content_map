@@ -8,7 +8,7 @@ from enum import Enum, IntEnum
 
 class UserContext(str, Enum):
     default = 'DEFAULT'
-    ugs = 'UGS'
+    ugc = 'UGC'
 
 
 class PlaceState(IntEnum):
