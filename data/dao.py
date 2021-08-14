@@ -19,7 +19,7 @@ def get_screen_coordinate_bounds(
         latitude: float,
         longitude: float,
         zoom: float,
-) -> Tuple[float]:
+) -> Tuple:
     """
     Получить примерные географические
     координаты возле углов viewport'a
