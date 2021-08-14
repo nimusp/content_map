@@ -5,7 +5,7 @@ from http import HTTPStatus
 from aiohttp_pydantic.oas.typing import r200, r201, r400, r404
 from sqlalchemy.exc import NoResultFound
 
-from api.base_view import BaseView
+from api.base_view import BaseView, AuthErr
 
 from api.schema import (
     GetVisitedPlacesResponse,
@@ -27,14 +27,29 @@ class VisitedPlaces(BaseView):
     # FIXME: zoom >17 == 17
 
     async def get(
-            self, user_email: str,
+            self,
             latitude: float,
             longitude: float,
             zoom: float,
             device_width: Optional[Union[int, float]] = EMULATOR_SCREEN.width,
             device_height: Optional[Union[int, float]] = EMULATOR_SCREEN.height,
             state: Optional[UserContext] = UserContext.default,
+            user_email: Optional[str] = '',
+            *, token: Optional[str] = '',
     ) -> Union[r200[GetVisitedPlacesResponse], r404[CommonError]]:
+        # TODO: delete me after auth token use
+        if not user_email and not token:
+            return web.json_response(
+                CommonError(error_message='token or email must be not empty').dict(),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        # TODO: set token NOT optional later
+        if token:
+            try:
+                user_email = await self.get_email_from_token(token)
+            except AuthErr as ex:
+                return web.json_response(CommonError(error_message=ex.message).dict(), status=ex.http_code)
 
         device = ScreenResolution(device_width, device_height)
         user_places = await self.dao.get_visited_places(
@@ -84,8 +99,22 @@ class VisitedPlaces(BaseView):
         )
 
     async def post(
-            self, request: AddVisitedPlacesRequest
+            self, request: AddVisitedPlacesRequest,
+            *, token: Optional[str] = '',
     ) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
+        # TODO: delete me after auth token use
+        if not request.user_email and not token:
+            return web.json_response(
+                CommonError(error_message='token or email must be not empty').dict(),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        # TODO: set token NOT optional later
+        if token:
+            try:
+                request.user_email = await self.get_email_from_token(token)
+            except AuthErr as ex:
+                return web.json_response(CommonError(error_message=ex.message).dict(), status=ex.http_code)
 
         coordinates = f'POINT({request.longitude} {request.latitude})'
         await self.dao.add_user_places(

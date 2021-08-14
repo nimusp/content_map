@@ -15,9 +15,16 @@ from api.schema import (
 
 class UserFeedbacks(BaseView):
     async def get(
-            self, user_email: str,
+            self, user_email: Optional[str],
             *, token: Optional[str] = '',
     ) -> Union[r200[AddUserFeedbackResponse], r404[CommonError]]:
+        # TODO: delete me after auth token use
+        if not user_email and not token:
+            return web.json_response(
+                CommonError(error_message='token or email must be not empty').dict(),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
         if token:
             try:
                 user_email = await self.get_email_from_token(token)
@@ -26,6 +33,7 @@ class UserFeedbacks(BaseView):
 
         feedbacks = await self.dao.get_user_feedbacks(user_email=user_email)
 
+        # TODO: set token NOT optional later
         if not feedbacks:
             return web.json_response(
                 CommonError(error_message="no one feedback for current user").dict(),
@@ -47,7 +55,24 @@ class UserFeedbacks(BaseView):
             status=HTTPStatus.OK,
         )
 
-    async def post(self, feedback: Feedback) -> r201[AddUserFeedbackResponse]:
+    async def post(
+            self, feedback: Feedback,
+            *, token: Optional[str] = '',
+    ) -> r201[AddUserFeedbackResponse]:
+        # TODO: delete me after auth token use
+        if not feedback.user_email and not token:
+            return web.json_response(
+                CommonError(error_message='token or email must be not empty').dict(),
+                status=HTTPStatus.BAD_REQUEST,
+            )
+
+        # TODO: set token NOT optional later
+        if token:
+            try:
+                feedback.user_email = await self.get_email_from_token(token)
+            except AuthErr as ex:
+                return web.json_response(CommonError(error_message=ex.message).dict(), status=ex.http_code)
+
         feedback_id = await self.dao.post_user_feedback(feedback=feedback)
 
         return web.json_response(
