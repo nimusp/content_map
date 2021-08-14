@@ -1,10 +1,10 @@
-from typing import Union
+from typing import Union, Optional
 from http import HTTPStatus
 
 from aiohttp import web
 from aiohttp_pydantic.oas.typing import r200, r201, r404
 
-from api.base_view import BaseView
+from api.base_view import BaseView, AuthErr
 from api.schema import (
     GetUserFeedbacksResponse,
     Feedback,
@@ -15,8 +15,14 @@ from api.schema import (
 
 class UserFeedbacks(BaseView):
     async def get(
-        self, user_email: str
-    ) -> Union[r200[GetUserFeedbacksResponse], r404[CommonError]]:
+            self, user_email: str,
+            *, token: Optional[str] = '',
+    ) -> Union[r200[AddUserFeedbackResponse], r404[CommonError]]:
+        if token:
+            try:
+                user_email = await self.get_email_from_token(token)
+            except AuthErr as ex:
+                return web.json_response(CommonError(error_message=ex.message).dict(), status=ex.http_code)
 
         feedbacks = await self.dao.get_user_feedbacks(user_email=user_email)
 
