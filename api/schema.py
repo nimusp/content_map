@@ -34,7 +34,7 @@ class Place(BaseModel):
     latitude: confloat(ge=-90, le=90)
     longitude: confloat(ge=-180, le=180)
     state: PlaceState = PlaceState.smallest
-    feedback: FeedbackSmall = None
+
 
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]

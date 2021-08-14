@@ -18,13 +18,15 @@ from api.schema import (
     FeedbackSmall,
     ScreenResolution,
 )
+from pydantic import (
+    confloat
+)
 from data.schema import UsersTable, PlacesTable
 from utils.emulator_specifications import EMULATOR_SCREEN
 
 
 class VisitedPlaces(BaseView):
     # FIXME: without feedback data
-    # FIXME: zoom >17 == 17
 
     async def get(
             self, user_email: str,
@@ -35,6 +37,15 @@ class VisitedPlaces(BaseView):
             device_height: Optional[Union[int, float]] = EMULATOR_SCREEN.height,
             state: Optional[UserContext] = UserContext.default,
     ) -> Union[r200[GetVisitedPlacesResponse], r404[CommonError]]:
+        if zoom < 2.0 or zoom > 21.0:
+            return web.json_response(
+                CommonError(
+                    error_message=f'invalid zoom, must be 2.0 <= zoom <= 21.0; {zoom}'
+                ).dict(), status=HTTPStatus.NOT_FOUND
+            )
+        if zoom > 17.0:
+            zoom = 17.0
+
 
         device = ScreenResolution(device_width, device_height)
         user_places = await self.dao.get_visited_places(
