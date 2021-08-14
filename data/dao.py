@@ -111,7 +111,6 @@ class Dao:
         :return:
         """
         async with self._session_maker() as session:
-
             srid = 4326
             wkt_point = f'POINT({longitude} {latitude})'
 
@@ -129,6 +128,15 @@ class Dao:
                 select([user_places.c.place_uid])
                 .where(user_places.c.user_email == email)
             )
+            uids_without_feedback = (
+                select([uids.c.place_uid])
+                .select_from(
+                    join(uids, UserFeedbacksTable,
+                         uids.c.place_uid == UserFeedbacksTable.place_uid,
+                         isouter=True)
+                )
+                .where(UserFeedbacksTable.place_uid == None)
+            )
             stmt = (
                 select([
                     PlacesTable.uid,
@@ -138,8 +146,8 @@ class Dao:
                 ])
                 .select_from(
                     join(
-                        PlacesTable, uids,
-                        PlacesTable.uid == uids.c.place_uid,
+                        PlacesTable, uids_without_feedback,
+                        PlacesTable.uid == uids_without_feedback.c.place_uid,
                     )
                 )
                 .where(
