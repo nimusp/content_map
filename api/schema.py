@@ -1,4 +1,5 @@
-from typing import List, Optional
+from typing import List, Optional, Union
+from dataclasses import dataclass
 from pydantic import (
     BaseModel, Extra, validator, EmailStr,
     conint, confloat
@@ -6,7 +7,13 @@ from pydantic import (
 from enum import Enum, IntEnum
 
 
-class UserContext(str, Enum):
+@dataclass
+class ScreenResolution:
+    width: Union[int, float]
+    height: Union[int, float]
+
+
+class UserContext(Enum):
     default = 'DEFAULT'
     ugc = 'UGC'
 

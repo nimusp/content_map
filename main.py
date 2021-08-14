@@ -5,7 +5,6 @@ from api.base_view import DB_KEY
 
 from api.visited_places import VisitedPlaces
 from api.user_feedbacks import UserFeedbacks
-from api.viewport_coords import ViewportCoords
 
 from data.schema import get_db_conn_sessionmaker
 
@@ -18,7 +17,6 @@ app.add_routes([
     web.post('/visited_places', VisitedPlaces),
     web.get('/user_feedbacks', UserFeedbacks),
     web.post('/user_feedback', UserFeedbacks),
-    web.get('/viewport_coords', ViewportCoords),
 ])
 
 

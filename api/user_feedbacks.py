@@ -16,7 +16,7 @@ from api.schema import (
 class UserFeedbacks(BaseView):
     async def get(
         self, user_email: str
-    ) -> Union[r200[AddUserFeedbackResponse], r404[CommonError]]:
+    ) -> Union[r200[GetUserFeedbacksResponse], r404[CommonError]]:
 
         feedbacks = await self.dao.get_user_feedbacks(user_email=user_email)
 
