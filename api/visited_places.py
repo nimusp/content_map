@@ -51,7 +51,8 @@ class VisitedPlaces(BaseView):
                     uid=uid,
                     id=id_,
                     latitude=lat,
-                    longitude=lon
+                    longitude=lon,
+                    state=PlaceState.full
                 )
                 print(closest_place)
                 return web.json_response(
@@ -71,7 +72,8 @@ class VisitedPlaces(BaseView):
                     uid=uid,
                     id=id_,
                     latitude=lat,
-                    longitude=lon
+                    longitude=lon,
+                    state=PlaceState.smallest
                 ) for uid, id_, lat, lon in user_places.all()
             ]).dict(),
             status=HTTPStatus.OK

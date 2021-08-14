@@ -73,4 +73,4 @@ def get_db_conn_sessionmaker():
     return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 
-asyncio.get_event_loop().run_until_complete(main())
+asyncio.new_event_loop().run_until_complete(main())
