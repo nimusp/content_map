@@ -197,7 +197,7 @@ class Dao:
         async with self._session_maker() as session:
             stmt = (
                 select(UserFeedbacksTable)
-                    .where(UserFeedbacksTable.user_email == user_email)
+                .where(UserFeedbacksTable.user_email == user_email)
             )
             result = await session.execute(stmt)
             return result.scalars().all()
@@ -214,6 +214,10 @@ class Dao:
                         feedback_text=feedback.feedback_text,
                     )
                     .returning(UserFeedbacksTable.id)
+                    .on_conflict_do_update(
+                        index_elements=['user_email', 'place_uid'],
+                        set_=dict(rate=feedback.rate, feedback_text=feedback.feedback_text),
+                    )
                 )
                 result = await session.execute(stmt)
             return result.scalar()

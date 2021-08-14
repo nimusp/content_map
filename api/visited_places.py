@@ -2,8 +2,7 @@ from typing import Optional, Union
 
 from aiohttp import web
 from http import HTTPStatus
-from aiohttp_pydantic.oas.typing import r200, r201, r400, r404
-from sqlalchemy.exc import NoResultFound
+from aiohttp_pydantic.oas.typing import r200, r201, r400, r401, r404
 
 from api.base_view import BaseView, AuthErr
 
@@ -15,18 +14,14 @@ from api.schema import (
     AddVisitedPlacesResponse,
     UserContext,
     PlaceState,
-    FeedbackSmall,
     ScreenResolution,
 )
-from pydantic import (
-    confloat
-)
-from data.schema import UsersTable, PlacesTable
+
+from data.schema import PlacesTable
 from utils.emulator_specifications import EMULATOR_SCREEN
 
 
 class VisitedPlaces(BaseView):
-    # FIXME: without feedback data
 
     async def get(
             self,
@@ -38,12 +33,12 @@ class VisitedPlaces(BaseView):
             state: Optional[UserContext] = UserContext.default,
             user_email: Optional[str] = '',
             *, token: Optional[str] = '',
-    ) -> Union[r200[GetVisitedPlacesResponse], r404[CommonError]]:
+    ) -> Union[r200[GetVisitedPlacesResponse], r400[CommonError], r401[CommonError], r404[CommonError]]:
         if zoom < 2.0 or zoom > 21.0:
             return web.json_response(
                 CommonError(
                     error_message=f'invalid zoom, must be 2.0 <= zoom <= 21.0; {zoom}'
-                ).dict(), status=HTTPStatus.NOT_FOUND
+                ).dict(), status=HTTPStatus.BAD_REQUEST
             )
         if zoom > 17.0:
             zoom = 17.0
@@ -112,7 +107,7 @@ class VisitedPlaces(BaseView):
     async def post(
             self, request: AddVisitedPlacesRequest,
             *, token: Optional[str] = '',
-    ) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
+    ) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError], r401[CommonError]]:
         # TODO: delete me after auth token use
         if not request.user_email and not token:
             return web.json_response(

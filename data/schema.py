@@ -2,13 +2,13 @@ import os
 import sys
 import asyncio
 
-from sqlalchemy import Column, Integer, Float, String, Text, Table, BigInteger
+from sqlalchemy import Column, Integer, String, Text, Table, BigInteger
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.schema import ForeignKey
+from sqlalchemy.sql.schema import ForeignKey, UniqueConstraint
 from geoalchemy2 import Geometry
 
 
@@ -52,6 +52,7 @@ class UserFeedbacksTable(Base):
     place_uid = Column(String, ForeignKey('places.uid'), nullable=False)
     rate = Column(Integer, nullable=False, default=0)
     feedback_text = Column(Text, nullable=False, default='')
+    __table_args__ = (UniqueConstraint('user_email', 'place_uid', name='user_email_place_uid_pkey'),)
 
 
 async def main():

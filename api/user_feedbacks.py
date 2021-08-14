@@ -2,7 +2,7 @@ from typing import Union, Optional
 from http import HTTPStatus
 
 from aiohttp import web
-from aiohttp_pydantic.oas.typing import r200, r201, r404
+from aiohttp_pydantic.oas.typing import r200, r201, r400, r401, r404
 
 from api.base_view import BaseView, AuthErr
 from api.schema import (
@@ -17,7 +17,7 @@ class UserFeedbacks(BaseView):
     async def get(
             self, user_email: Optional[str],
             *, token: Optional[str] = '',
-    ) -> Union[r200[AddUserFeedbackResponse], r404[CommonError]]:
+    ) -> Union[r200[GetUserFeedbacksResponse], r400[CommonError], r401[CommonError], r404[CommonError]]:
         # TODO: delete me after auth token use
         if not user_email and not token:
             return web.json_response(
@@ -58,7 +58,7 @@ class UserFeedbacks(BaseView):
     async def post(
             self, feedback: Feedback,
             *, token: Optional[str] = '',
-    ) -> r201[AddUserFeedbackResponse]:
+    ) -> Union[r201[AddUserFeedbackResponse], r400[CommonError], r401[CommonError]]:
         # TODO: delete me after auth token use
         if not feedback.user_email and not token:
             return web.json_response(
