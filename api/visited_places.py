@@ -1,9 +1,8 @@
-from typing import Optional
+from typing import Optional, Union
 
 from aiohttp import web
 from http import HTTPStatus
 from aiohttp_pydantic.oas.typing import r200, r201, r400, r404
-from pydantic.typing import Union
 from sqlalchemy.exc import NoResultFound
 
 from api.base_view import BaseView
@@ -17,61 +16,84 @@ from api.schema import (
     UserContext,
     PlaceState,
     FeedbackSmall,
+    ScreenResolution,
 )
 from data.schema import UsersTable, PlacesTable
+from utils.emulator_specifications import EMULATOR_SCREEN
 
 
 class VisitedPlaces(BaseView):
+    # FIXME: without feedback data
+    # FIXME: zoom >17 == 17
 
     async def get(
             self, user_email: str,
-            latitude: Optional[float] = 0, longitude: Optional[float] = 0,
-            zoom: Optional[float] = 0,
+            latitude: float,
+            longitude: float,
+            zoom: float,
+            device_width: Optional[Union[int, float]] = EMULATOR_SCREEN.width,
+            device_height: Optional[Union[int, float]] = EMULATOR_SCREEN.height,
             state: Optional[UserContext] = UserContext.default,
     ) -> Union[r200[GetVisitedPlacesResponse], r404[CommonError]]:
-        user_model: UsersTable = None
-        try:
-            user_model = await self.dao.get_user_model(user_email)
-        except NoResultFound as ex:
-            pass
-            # TODO: log exception
 
-        if not user_model or len(user_model.visited_places) == 0:
-            return web.json_response(
-                CommonError(
-                    error_message=f'no data for user with email {user_email}'
-                ).dict(), status=HTTPStatus.NOT_FOUND
-            )
-
-        feedbacks_by_uids = {}
-        for feedback in user_model.feedbacks:
-            feedbacks_by_uids[feedback.place_uid] = FeedbackSmall(rate=feedback.rate, text=feedback.feedback_text)
-
-        user_places = [
-                    Place(
-                        uid=p.uid,
-                        id=p.id,
-                        latitude=p.latitude,
-                        longitude=p.longitude,
-                        feedback=feedbacks_by_uids.get(p.uid, None),
-                    ) for p in user_model.visited_places
-                ]
-
-        # TODO: find closest for passed lat/lon + zoom
+        device = ScreenResolution(device_width, device_height)
+        user_places = await self.dao.get_visited_places(
+            email=user_email,
+            latitude=latitude, longitude=longitude, zoom=zoom, device=device
+        )
         if state == UserContext.default:
-            user_places = user_places[:1]
-            user_places[0].state = PlaceState.full
+            # Берем первый элемент, т.к. запрос к БД
+            # вернул отсортированный по дистанции список
+            place = user_places.first()
+            if place:
+                uid, id_, lon, lat = place
+                closest_place = Place(
+                    uid=uid,
+                    id=id_,
+                    latitude=lat,
+                    longitude=lon,
+                    state=PlaceState.full
+                )
+                print(closest_place)
+                return web.json_response(
+                    GetVisitedPlacesResponse(places=[closest_place]).dict(),
+                    status=HTTPStatus.OK
+                )
+            else:
+                return web.json_response(
+                    CommonError(
+                        error_message=f'no data for user with email {user_email}'
+                    ).dict(), status=HTTPStatus.NOT_FOUND
+                )
 
-        return web.json_response(GetVisitedPlacesResponse(places=user_places).dict(), status=HTTPStatus.OK)
+        places = [
+            Place(
+                uid=uid,
+                id=id_,
+                latitude=lat,
+                longitude=lon,
+                state=PlaceState.smallest
+            ) for uid, id_, lat, lon in user_places.all()
+        ]
+        # Изменяем PlaceState на full для ближайшей точки
+        if places:
+            places[0].state = PlaceState.full
+        return web.json_response(
+            GetVisitedPlacesResponse(places=places).dict(),
+            status=HTTPStatus.OK
+        )
 
-    async def post(self, request: AddVisitedPlacesRequest) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
+    async def post(
+            self, request: AddVisitedPlacesRequest
+    ) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
+
+        coordinates = f'POINT({request.longitude} {request.latitude})'
         await self.dao.add_user_places(
             request.user_email,
             place=PlacesTable(
                 uid=request.place_uid,
                 id=request.place_id,
-                latitude=request.latitude,
-                longitude=request.longitude,
+                coordinates=coordinates
             ),
         )
 

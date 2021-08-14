@@ -3,13 +3,13 @@ import sys
 import asyncio
 
 from sqlalchemy import Column, Integer, Float, String, Text, Table, BigInteger
-
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.session import sessionmaker
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
+from geoalchemy2 import Geometry
 
 
 Base = declarative_base()
@@ -40,8 +40,9 @@ class PlacesTable(Base):
     __tablename__ = 'places'
     uid = Column(String, primary_key=True)
     id = Column(BigInteger, nullable=False, default=0)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    coordinates = Column(Geometry(
+        geometry_type='POINT', srid=4326, nullable=False)
+    )
 
 
 class UserFeedbacksTable(Base):

@@ -1,9 +1,16 @@
-from typing import List, Optional
+from typing import List, Optional, Union
+from dataclasses import dataclass
 from pydantic import (
     BaseModel, Extra, validator, EmailStr,
     conint, confloat
 )
 from enum import Enum, IntEnum
+
+
+@dataclass
+class ScreenResolution:
+    width: Union[int, float]
+    height: Union[int, float]
 
 
 class UserContext(str, Enum):
@@ -28,7 +35,6 @@ class Place(BaseModel):
     longitude: confloat(ge=-180, le=180)
     state: PlaceState = PlaceState.smallest
     feedback: FeedbackSmall = None
-
 
 class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
     places: List[Place]
