@@ -94,7 +94,7 @@ class VisitedPlaces(BaseView):
                 latitude=lat,
                 longitude=lon,
                 state=PlaceState.smallest
-            ) for uid, id_, lat, lon in user_places.all()
+            ) for uid, id_, lon, lat in user_places.all()
         ]
         # Изменяем PlaceState на full для ближайшей точки
         if places:
