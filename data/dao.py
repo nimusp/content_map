@@ -207,13 +207,13 @@ class Dao:
             async with session.begin():
                 stmt = (
                     insert(UserFeedbacksTable)
-                        .values(
+                    .values(
                         user_email=feedback.user_email,
                         place_uid=feedback.place_uid,
                         rate=feedback.rate,
                         feedback_text=feedback.feedback_text,
                     )
-                        .returning(UserFeedbacksTable.id)
+                    .returning(UserFeedbacksTable.id)
                 )
                 result = await session.execute(stmt)
             return result.scalar()
