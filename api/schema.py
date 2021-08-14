@@ -13,7 +13,7 @@ class ScreenResolution:
     height: Union[int, float]
 
 
-class UserContext(Enum):
+class UserContext(str, Enum):
     default = 'DEFAULT'
     ugc = 'UGC'
 
