@@ -174,8 +174,7 @@ class Dao:
                     values(
                     uid=place.uid,
                     id=place.id,
-                    latitude=place.latitude,
-                    longitude=place.longitude
+                    coordinates=place.coordinates
                 ).on_conflict_do_nothing()
 
                 await session.execute(query)

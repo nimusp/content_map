@@ -66,16 +66,20 @@ class VisitedPlaces(BaseView):
                     ).dict(), status=HTTPStatus.NOT_FOUND
                 )
 
+        places = [
+            Place(
+                uid=uid,
+                id=id_,
+                latitude=lat,
+                longitude=lon,
+                state=PlaceState.smallest
+            ) for uid, id_, lat, lon in user_places.all()
+        ]
+        # Изменяем PlaceState на full для ближайшей точки
+        if places:
+            places[0].state = PlaceState.full
         return web.json_response(
-            GetVisitedPlacesResponse(places=[
-                Place(
-                    uid=uid,
-                    id=id_,
-                    latitude=lat,
-                    longitude=lon,
-                    state=PlaceState.smallest
-                ) for uid, id_, lat, lon in user_places.all()
-            ]).dict(),
+            GetVisitedPlacesResponse(places=places).dict(),
             status=HTTPStatus.OK
         )
 
@@ -83,13 +87,13 @@ class VisitedPlaces(BaseView):
             self, request: AddVisitedPlacesRequest
     ) -> Union[r201[AddVisitedPlacesResponse], r400[CommonError]]:
 
+        coordinates = f'POINT({request.longitude} {request.latitude})'
         await self.dao.add_user_places(
             request.user_email,
             place=PlacesTable(
                 uid=request.place_uid,
                 id=request.place_id,
-                latitude=request.latitude,
-                longitude=request.longitude,
+                coordinates=coordinates
             ),
         )
 
