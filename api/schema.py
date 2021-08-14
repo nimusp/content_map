@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 from dataclasses import dataclass
 from pydantic import (
-    BaseModel, Extra, validator, EmailStr,
+    BaseModel, EmailStr,
     conint, confloat
 )
 from enum import Enum, IntEnum
@@ -36,36 +36,36 @@ class Place(BaseModel):
     state: PlaceState = PlaceState.smallest
 
 
-class GetVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
+class GetVisitedPlacesResponse(BaseModel):
     places: List[Place]
 
 
-class CommonError(BaseModel, extra=Extra.forbid):
+class CommonError(BaseModel):
     error_message: str
 
 
-class AddVisitedPlacesRequest(BaseModel, extra=Extra.forbid):
-    user_email: str
+class AddVisitedPlacesRequest(BaseModel):
+    user_email: Optional[str]
     place_uid: str
     place_id: int = 0
     latitude: float
     longitude: float
 
 
-class AddVisitedPlacesResponse(BaseModel, extra=Extra.forbid):
+class AddVisitedPlacesResponse(BaseModel):
     place_uid: str
 
 
-class Feedback(BaseModel, extra=Extra.forbid):
-    user_email: EmailStr
+class Feedback(BaseModel):
+    user_email: Optional[EmailStr]
     place_uid: str
     rate: conint(ge=0, le=5)
     feedback_text: str
 
 
-class GetUserFeedbacksResponse(BaseModel, extra=Extra.forbid):
+class GetUserFeedbacksResponse(BaseModel):
     feedbacks: List[Feedback]
 
 
-class AddUserFeedbackResponse(BaseModel, extra=Extra.forbid):
+class AddUserFeedbackResponse(BaseModel):
     feedback_id: int
