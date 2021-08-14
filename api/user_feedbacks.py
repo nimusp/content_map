@@ -6,7 +6,8 @@ from aiohttp_pydantic.oas.typing import r200, r201, r404
 
 from api.base_view import BaseView, AuthErr
 from api.schema import (
-    GetUserFeedbacksResponse, Feedback,
+    GetUserFeedbacksResponse,
+    Feedback,
     AddUserFeedbackResponse,
     CommonError,
 )
@@ -27,8 +28,8 @@ class UserFeedbacks(BaseView):
 
         if not feedbacks:
             return web.json_response(
-                CommonError(error_message='no one feedback for current user').dict(),
-                status=HTTPStatus.NOT_FOUND
+                CommonError(error_message="no one feedback for current user").dict(),
+                status=HTTPStatus.NOT_FOUND,
             )
 
         return web.json_response(
@@ -38,17 +39,18 @@ class UserFeedbacks(BaseView):
                         user_email=f.user_email,
                         place_uid=f.place_uid,
                         rate=f.rate,
-                        feedback_text=f.feedback_text) for f in feedbacks
+                        feedback_text=f.feedback_text,
+                    )
+                    for f in feedbacks
                 ],
             ).dict(),
-            status=HTTPStatus.OK)
+            status=HTTPStatus.OK,
+        )
 
     async def post(self, feedback: Feedback) -> r201[AddUserFeedbackResponse]:
         feedback_id = await self.dao.post_user_feedback(feedback=feedback)
 
         return web.json_response(
-            AddUserFeedbackResponse(
-                feedback_id=feedback_id
-            ).dict(),
-            status=HTTPStatus.CREATED
+            AddUserFeedbackResponse(feedback_id=feedback_id).dict(),
+            status=HTTPStatus.CREATED,
         )
