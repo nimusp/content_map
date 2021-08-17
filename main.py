@@ -10,8 +10,17 @@ from data.schema import get_db_conn_sessionmaker
 
 from data.dao import Dao
 
+from aiohttp import web
 
-app = web.Application()
+
+@web.middleware
+async def error_middleware(request, handler):
+    try:
+        return await handler(request)
+    except web.HTTPNotFound:
+        raise web.HTTPFound('/docs')
+
+app = web.Application(middlewares=[error_middleware])
 app.add_routes([
     web.get('/visited_places', VisitedPlaces),
     web.post('/visited_places', VisitedPlaces),
