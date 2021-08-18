@@ -1,11 +1,13 @@
 import pytest
 from sqlalchemy import create_engine
+import os
 
 from main import app
 
 
 @pytest.fixture
-async def api_client(aiohttp_client):
+async def api_client(postgres, aiohttp_client):
+    os.environ["DSN"] = postgres
     client = await aiohttp_client(app)
     try:
         yield client
